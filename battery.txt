@@ -1,0 +1,213 @@
+reset;
+model battery.mod;
+data battery.dat;
+option solver cplex;
+solve;
+
+print "These are the final left side of the first constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display sum{i in PRODUCT,k in FACILITY} (Prodcost[i,1]+transcost[i,1]) * Produce[i,k,1] + sum {i in PRODUCT,s in SCENARIO, n in WAREHOUSE} prob[s]*holding_cost[i,1]*Inventory2[i,n,1,s] + sum {i in PRODUCT,s in SCENARIO,k in FACILITY} prob[s]*Purchase_cost[i,1]*Product_purchased[i,k,1,s]
++ sum{i in PRODUCT,t in PERIOD2_TO_END,s in SCENARIO} ((sum{k in FACILITY} prob[s]*((Prodcost[i,t]+transcost[i,t])*Produce2[i,k,t,s]+Purchase_cost[i,t]*Product_purchased[i,k,t,s]))+(sum{n in WAREHOUSE} prob[s]*holding_cost[i,t]*Inventory2[i,n,t,s])) + sum{k in FACILITY} phi_battery*acost_battery*(Batt_capacity1[k]/24) + sum{g in TECHNOLOGY,k in FACILITY} phi_tech[g]*acost_tech[g]*Tech_capacity[k,g] 
++ sum{g in TECHNOLOGY,s in SCENARIO, k in FACILITY} prob[s]*(annual_om_cost[g] - annual_penalty_cost[g])*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor[g,j,s]/days_in_period12))*Tech_capacity[k,g] - sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell1[k,j,s]*sell_cost + sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy1[k,j,s]*buy_cost + sum{n in WAREHOUSE} phi_battery*acost_battery*(Batt_capacity2[n]/24) + sum{g in TECHNOLOGY, n in WAREHOUSE} phi_tech[g]*acost_tech[g]*Tech_capacity2[n,g] 
++ sum{g in TECHNOLOGY,s in SCENARIO, n in WAREHOUSE} prob[s]*(annual_om_cost[g] - annual_penalty_cost[g])*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor1[g,j,s]/days_in_period12))*Tech_capacity2[n,g] - sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell2[n,j,s]*sell_cost + sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy2[n,j,s]*buy_cost>result_battery_optim;
+
+
+
+print "These are the optimum values for Produce,Produce2,Inventory,Inventory2,Product_purchased,Tech_capacity,Tech_capacity2,Batt_capacity1,Batt_capacity2,Battery_facility1,Battery_facility2,Battery_warehouse1,Battery_warehouse2" > result_battery_optim;
+print "" > result_battery_optim;
+display Produce > result_battery_optim; 
+display Produce2 > result_battery_optim; 
+display Inventory > result_battery_optim; 
+display Inventory2 > result_battery_optim; 
+display Product_purchased > result_battery_optim; 
+display Tech_capacity > result_battery_optim; 
+display Tech_capacity2 > result_battery_optim; 
+display sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell1[k,j,s]> result_battery_optim; 
+display sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell1[k,j,s]*sell_cost> result_battery_optim; 
+display sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy1[k,j,s]> result_battery_optim; 
+display sum{k in FACILITY,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy1[k,j,s]*buy_cost> result_battery_optim; 
+display sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell2[n,j,s]> result_battery_optim; 
+display sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*sell2[n,j,s]*sell_cost> result_battery_optim; 
+display sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy2[n,j,s]> result_battery_optim; 
+display sum{n in WAREHOUSE,j in DAY_IN_PERIOD,s in SCENARIO} prob[s]*buy2[n,j,s]*buy_cost> result_battery_optim; 
+display sum{k in FACILITY} phi_battery*acost_battery*(Batt_capacity1[k]/24) + sum{g in TECHNOLOGY,k in FACILITY} phi_tech[g]*acost_tech[g]*Tech_capacity[k,g] + sum{g in TECHNOLOGY,s in SCENARIO, k in FACILITY} prob[s]*(annual_om_cost[g] - annual_penalty_cost[g])*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor[g,j,s]/days_in_period12))*Tech_capacity[k,g]> result_battery_optim;
+display sum{g in TECHNOLOGY,s in SCENARIO, k in FACILITY} prob[s]*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor[g,j,s]/days_in_period12))*Tech_capacity[k,g]> result_battery_optim;
+display sum{n in WAREHOUSE} phi_battery*acost_battery*(Batt_capacity2[n]/24) + sum{g in TECHNOLOGY, n in WAREHOUSE} phi_tech[g]*acost_tech[g]*Tech_capacity2[n,g] + sum{g in TECHNOLOGY,s in SCENARIO, n in WAREHOUSE} prob[s]*(annual_om_cost[g] - annual_penalty_cost[g])*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor1[g,j,s]/days_in_period12))*Tech_capacity2[n,g]> result_battery_optim;
+display sum{g in TECHNOLOGY,s in SCENARIO, n in WAREHOUSE} prob[s]*generation_hours_year[g]*(sum{j in DAY_IN_PERIOD}(cap_factor1[g,j,s]/days_in_period12))*Tech_capacity2[n,g]> result_battery_optim;
+display Battery_facility1 > result_battery_optim; 
+display Battery_facility2 > result_battery_optim; 
+display Battery_warehouse1 > result_battery_optim; 
+display Battery_warehouse2 > result_battery_optim;
+display Batt_capacity1 > result_battery_optim;
+display Batt_capacity2 > result_battery_optim;
+
+print "These are the final left side of the first constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {i in PRODUCT, n in WAREHOUSE}: Inventory[i,n,0] > result_battery_optim;
+print "These are the final right side of the first constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {i in PRODUCT, n in WAREHOUSE}: Inv0prod[i,n] > result_battery_optim;
+
+#print "These are the final left side of the second constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY}: Battery_facility1[1,0] > result_battery_optim;
+#print "These are the final right side of the second constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY}:Batt_capacity1[k] > result_battery_optim;
+
+#print "These are the final left side of the third constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {n in WAREHOUSE}: Battery_warehouse1[1,0] > result_battery_optim;
+#print "These are the final right side of the third constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {n in WAREHOUSE}:Batt_capacity2[n] > result_battery_optim;
+
+#print "These are the final left side of the fourth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in ONLY1}: sum{i in PRODUCT} Produce[i,k,t] > result_battery_optim;
+#print "These are the final right side of the fourth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in ONLY1}: MPC[k,t] > result_battery_optim;
+
+#print "These are the final left side of the fifth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in PERIOD2_TO_END,s in SCENARIO}: sum{i in PRODUCT} Produce2[i,k,t,s] > result_battery_optim;
+#print "These are the final right side of the fifth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in PERIOD2_TO_END}: MPC[k,t] > result_battery_optim;
+
+#print "These are the final left side of the sixth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {n in WAREHOUSE,t in PERIOD1_TO_END, s in SCENARIO}: sum{i in PRODUCT} Inventory2[i,n,t,s] > result_battery_optim;
+#print "These are the final right side of the sixth constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {n in WAREHOUSE,t in PERIOD1_TO_END}: MS[n,t] > result_battery_optim;
+
+#print "These are the final left side of the seventh constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in PERIOD1_TO_END, s in SCENARIO}: sum{i in PRODUCT} Product_purchased[i,k,t,s] > result_battery_optim;
+#print "These are the final right side of the seventh constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {k in FACILITY,t in PERIOD1_TO_END}: MP[k,t] > result_battery_optim;
+
+
+#without purchasing
+print "These are the final left side of the eighth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,t in ONLY1,i in PRODUCT,k in FACILITY,n in WAREHOUSE}: Produce[i,k,t] + Inventory[i,n,t-1]  > result_battery_optim;
+print "These are the final right side of the eighth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,t in ONLY1,i in PRODUCT,k in FACILITY,n in WAREHOUSE}: Demand[i,k,t,s] + Inventory2[i,n,t,s] > result_battery_optim;
+
+print "These are the final left side of the ninth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,t in PERIOD2_TO_END,i in PRODUCT,k in FACILITY,n in WAREHOUSE}: Produce2[i,k,t,s] + Inventory2[i,n,t-1,s]  > result_battery_optim;
+print "These are the final right side of the ninth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,t in PERIOD2_TO_END,i in PRODUCT,k in FACILITY,n in WAREHOUSE}: Demand[i,k,t,s] + Inventory2[i,n,t,s] > result_battery_optim;
+
+print "These are the final left side of the tenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY,r in RESOURCE,t in ONLY1}: sum {i in PRODUCT} Resource[i,k,r]*Produce[i,k,t] > result_battery_optim;
+print "These are the final right side of the tenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY,r in RESOURCE,t in ONLY1}: avail[k,r,t] > result_battery_optim;
+
+print "These are the final left side of the eleventh constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY,s in SCENARIO,r in RESOURCE,t in PERIOD2_TO_END}: sum {i in PRODUCT} Resource[i,k,r]*Produce2[i,k,t,s] > result_battery_optim;
+print "These are the final right side of the eleventh constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY,r in RESOURCE,t in PERIOD2_TO_END}: avail[k,r,t] > result_battery_optim;
+
+#print "These are the final left side of the elll constraint" > result_battery_optim;
+#print "" > result_battery_optim;
+#display {c in SCENARIO_1,g in TECHNOLOGY,j in 2..J}:(sum{s in SCENARIO} scen_links1[c,s]*prob[s]*cap_factor[g,j,s])-(sum{s in SCENARIO}scen_links1[c,s]*prob[s]*cap_factor[g,j,s]) > result_battery_optim;
+#print "These are the final right side of the eleventh constraint" > result_battery_optim;#print "" > result_battery_optim;
+#display 0 > result_battery_optim;
+
+print "These are the final left side of the thirteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {t in ONLY1, j in FIRST_DAY,k in FACILITY,n in WAREHOUSE,s in SCENARIO}: sum{i in PRODUCT} ((energy_consumed[i] + energy_intensity_rate*distance[k,n]*unit_weight[i])*(Produce[i,k,1]/days_in_period1)) + days_operational_hours*electricity_demand_fac[k,s] + energy_intensity_rate*number_trips*distance[k,n]*self_weight + Battery_facility2[k,j,s]-Battery_facility1[k,j-1]+sell1[k,j,s] > result_battery_optim;
+print "These are the final right side of the thirteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,j in FIRST_DAY,k in FACILITY}:sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity[k,g]*cap_factor[g,j,s]+buy1[k,j,s] > result_battery_optim;
+
+print "These are the final left side of the thirteenthfourteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {t in ONLY1, j in 2..31,s in SCENARIO,k in FACILITY,n in WAREHOUSE}: sum{i in PRODUCT} ((energy_consumed[i] + energy_intensity_rate*distance[k,n]*unit_weight[i])*(Produce[i,k,1]/days_in_period1)) + days_operational_hours*electricity_demand_fac[k,s] + energy_intensity_rate*number_trips*distance[k,n]*self_weight + Battery_facility2[k,j,s]-Battery_facility2[k,j-1,s]+sell1[k,j,s] > result_battery_optim;
+print "These are the final right side of the fourteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {j in 2..31,s in SCENARIO,k in FACILITY}: sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity[k,g]*cap_factor[g,j,s]+buy1[k,j,s]> result_battery_optim;
+
+print "These are the final left side of the fourteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {t in PERIOD2_TO_END,j in DAYS_IN_PERIOD2,s in SCENARIO,k in FACILITY,n in WAREHOUSE}: (sum{i in PRODUCT} (energy_consumed[i] + energy_intensity_rate*distance[k,n]*unit_weight[i])*(Produce2[i,k,t,s]/days_in_period2)) + days_operational_hours*electricity_demand_fac[k,s] + energy_intensity_rate*number_trips*distance[k,n]*self_weight + Battery_facility2[k,j,s]-Battery_facility2[k,j-1,s]+sell1[k,j,s] > result_battery_optim;
+print "These are the final right side of the fourteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,j in DAYS_IN_PERIOD2,k in FACILITY}:sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity[k,g]*cap_factor[g,j,s]+buy1[k,j,s] > result_battery_optim;
+
+print "These are the final left side of the fifteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display { t in ONLY1,s in SCENARIO,j in FIRST_DAY,k in FACILITY,n in WAREHOUSE}: sum{i in PRODUCT} (product_demand[i]*(Inventory2[i,k,t,s]/days_in_period1)) + days_operational_hours*electricity_demand_war[n,s] +energy_intensity_rate*number_trips*distance2[n,k]*self_weight + Battery_warehouse2[n,j,s]-Battery_warehouse1[n,j-1] + sell2[n,j,s]> result_battery_optim;
+print "These are the final right side of the fifteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,j in FIRST_DAY,n in WAREHOUSE}: sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity2[n,g]*cap_factor[g,j,s] + buy2[n,j,s] > result_battery_optim;
+
+print "These are the final left side of the fifteenthsixteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {t in ONLY1, j in 2..31,s in SCENARIO,k in FACILITY,n in WAREHOUSE}: sum{i in PRODUCT} (product_demand[i]*(Inventory2[i,k,t,s]/30)) + days_operational_hours*electricity_demand_war[n,s] + energy_intensity_rate*number_trips*distance2[n,k]*self_weight + Battery_warehouse2[n,j,s] -Battery_warehouse2[n,j-1,s] + sell2[n,j,s]> result_battery_optim;
+print "These are the final right side of the fourteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,j in 2..31,n in WAREHOUSE}: sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity2[n,g]*cap_factor[g,j,s] + buy2[n,j,s] > result_battery_optim;
+
+print "These are the final left side of the sixteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {t in PERIOD2_TO_END,s in SCENARIO,j in DAYS_IN_PERIOD2,k in FACILITY,n in WAREHOUSE}: sum{i in PRODUCT} (product_demand[i]*(Inventory2[i,k,t,s]/2)) + days_operational_hours*electricity_demand_war[n,s] +energy_intensity_rate*number_trips*distance2[n,k]*self_weight + Battery_facility2[n,j,s]-Battery_facility2[n,j-1,s] + sell2[n,j,s]> result_battery_optim;
+print "These are the final right side of the sixteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {s in SCENARIO,j in DAYS_IN_PERIOD2,n in WAREHOUSE}sum {g in TECHNOLOGY} generation_hours[g]*Tech_capacity2[n,g]*cap_factor[g,j,s]  + buy2[n,j,s]> result_battery_optim;
+
+
+print "These are the final left side of the eighteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY, j in DAY_IN_PERIOD,s in SCENARIO}:Battery_facility2[k,j,s]> result_battery_optim;
+print "These are the final right side of the eighteenth constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY} Batt_capacity1[k] > result_battery_optim;
+
+
+print "These are the final left side of the twenty constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {n in WAREHOUSE, j in DAY_IN_PERIOD, s in SCENARIO}:Battery_warehouse2[n,j,s]> result_battery_optim;
+print "These are the final right side of the twenty constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {n in WAREHOUSE} Batt_capacity2[n] > result_battery_optim;
+
+print "These are the final left side of the twenty-one constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {k in FACILITY}: Batt_capacity1[k] > result_battery_optim;
+print "These are the final right side of the twenty-one constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display max_battery > result_battery_optim;
+
+print "These are the final left side of the twenty-two constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {n in WAREHOUSE}: Batt_capacity2[n] > result_battery_optim;
+print "These are the final right side of the twenty-two constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display max_battery > result_battery_optim;
+
+print "These are the final left side of the twenty-THREE constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {g in TECHNOLOGY,k in FACILITY} Tech_capacity[k,g] > result_battery_optim;
+print "These are the final right side of the twenty-one constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {g in TECHNOLOGY}:max_tech[g] > result_battery_optim;
+
+print "These are the final left side of the twenty-FOUR constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {g in TECHNOLOGY, n in WAREHOUSE} Tech_capacity2[n,g] > result_battery_optim;
+print "These are the final right side of the twenty-two constraint" > result_battery_optim;
+print "" > result_battery_optim;
+display {g in TECHNOLOGY}:max_tech[g] > result_battery_optim;
